@@ -113,6 +113,30 @@ describe("DB Routines", () => {
       `);
   });
 
+  /****Before writing the functions for these tests, go to routine_activities.js
+     and write the addActivityToRoutine function.****/
+
+  describe("createRoutine", () => {
+    xit("Creates and returns the new routine", async () => {
+      const user = await createFakeUser();
+      const routine = await createRoutine({
+        creatorId: user.id,
+        isPublic: true,
+        name: faker.random.uuid(),
+        goal: faker.random.uuid(),
+      });
+      expect(routine).toEqual(
+        objectContaining({
+          id: expect.any(Number),
+          creatorId: routine.creatorId,
+          isPublic: routine.isPublic,
+          name: routine.name,
+          goal: routine.goal,
+        })
+      );
+    });
+  });
+
   describe("getAllRoutines", () => {
     xit("should include the public routine", async () => {
       const routines = await getAllRoutines();
@@ -380,20 +404,6 @@ describe("DB Routines", () => {
       );
       expect(activity.routineId).toEqual(fakeRoutine.id);
       expect(activity.routineActivityId).toEqual(fakeRoutineActivity.id);
-    });
-  });
-
-  describe("createRoutine", () => {
-    xit("creates and returns the new routine", async () => {
-      const user = await createFakeUser();
-      const routine = await createRoutine({
-        creatorId: user.id,
-        isPublic: true,
-        name: faker.random.uuid(),
-        goal: faker.random.uuid(),
-      });
-      const queriedRoutine = await getRoutineById(routine.id);
-      expect(routine).toEqual(queriedRoutine);
     });
   });
 

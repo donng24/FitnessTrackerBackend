@@ -44,6 +44,17 @@ describe("DB Routine Activities", () => {
     };
   });
 
+  describe("addActivityToRoutine({ routineId, activityId, count, duration })", () => {
+    xit("creates a new routine_activity, and return it", async () => {
+      const routineActivity = await addActivityToRoutine(routineActivityData);
+
+      expect(routineActivity.routineId).toBe(routineActivityData.routineId);
+      expect(routineActivity.activityId).toBe(routineActivityData.activityId);
+      expect(routineActivity.count).toBe(routineActivityData.count);
+      expect(routineActivity.duration).toBe(routineActivityData.duration);
+    });
+  });
+
   describe("getRoutineActivityById", () => {
     xit("should return the routine activity by id", async () => {
       const fakeRoutineActivity = await createFakeRoutineActivity();
@@ -74,17 +85,6 @@ describe("DB Routine Activities", () => {
         fakeRoutine
       );
       expect(routineActivity.id).toEqual(fakeRoutineActivity.id);
-    });
-  });
-
-  describe("addActivityToRoutine({ routineId, activityId, count, duration })", () => {
-    xit("creates a new routine_activity, and return it", async () => {
-      const routineActivity = await addActivityToRoutine(routineActivityData);
-
-      expect(routineActivity.routineId).toBe(routineActivityData.routineId);
-      expect(routineActivity.activityId).toBe(routineActivityData.activityId);
-      expect(routineActivity.count).toBe(routineActivityData.count);
-      expect(routineActivity.duration).toBe(routineActivityData.duration);
     });
   });
 

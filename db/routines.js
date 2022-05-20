@@ -1,34 +1,24 @@
-const client = require('./client');
+const client = require("./client");
 
-async function getRoutineById(id){
-}
+async function createRoutine({ creatorId, isPublic, name, goal }) {}
 
-async function getRoutinesWithoutActivities(){
-}
+async function getRoutineById(id) {}
 
-async function getAllRoutines() {
-}
+async function getRoutinesWithoutActivities() {}
 
-async function getAllRoutinesByUser({username}) {
-}
+async function getAllRoutines() {}
 
-async function getPublicRoutinesByUser({username}) {
-}
+async function getAllPublicRoutines() {}
 
-async function getAllPublicRoutines() {
-}
+async function getAllRoutinesByUser({ username }) {}
 
-async function getPublicRoutinesByActivity({id}) {
-}
+async function getPublicRoutinesByUser({ username }) {}
 
-async function createRoutine({creatorId, isPublic, name, goal}) {
-}
+async function getPublicRoutinesByActivity({ id }) {}
 
-async function updateRoutine({id, ...fields}) {
-}
+async function updateRoutine({ id, ...fields }) {}
 
-async function destroyRoutine(id) {
-}
+async function destroyRoutine(id) {}
 
 module.exports = {
   getRoutineById,
@@ -41,4 +31,4 @@ module.exports = {
   createRoutine,
   updateRoutine,
   destroyRoutine,
-}
+};
