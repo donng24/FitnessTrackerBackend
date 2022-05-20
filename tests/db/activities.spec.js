@@ -15,8 +15,20 @@ const {
 const { createFakeActivity } = require("../helpers");
 
 describe("DB Activities", () => {
+  describe("createActivity({ name, description })", () => {
+    xit("Creates and returns the new activity", async () => {
+      const activityToCreate = {
+        name: "Marathon",
+        description: "Run all the miles",
+      };
+      const createdActivity = await createActivity(activityToCreate);
+      expect(createdActivity.name).toBe(activityToCreate.name);
+      expect(createdActivity.description).toBe(activityToCreate.description);
+    });
+  });
+
   describe("getAllActivities", () => {
-    xit("selects and returns an array of all activities", async () => {
+    xit("Selects and returns an array of all activities", async () => {
       await createFakeActivity("Sit ups", "Do 100 reps");
       const activities = await getAllActivities();
       const { rows: activitiesFromDatabase } = await client.query(`
@@ -27,11 +39,9 @@ describe("DB Activities", () => {
   });
 
   describe("getActivityById", () => {
-    xit("gets activities by their id", async () => {
+    xit("Gets activities by their id", async () => {
       const fakeActivity = await createFakeActivity("Crunches", "Do 40 reps");
-
       const activity = await getActivityById(fakeActivity.id);
-
       expect(activity.id).toEqual(fakeActivity.id);
       expect(activity.name).toEqual(fakeActivity.name);
       expect(activity.description).toEqual(fakeActivity.description);
@@ -39,25 +49,13 @@ describe("DB Activities", () => {
   });
 
   describe("getActivityByName", () => {
-    xit("gets an activity by it's name", async () => {
+    xit("Gets an activity by it's name", async () => {
       const fakeActivity = await createFakeActivity(
         "Power Walking",
         "At the mall"
       );
       const activity = await getActivityByName(fakeActivity.name);
       expect(activity.id).toEqual(fakeActivity.id);
-    });
-  });
-
-  describe("createActivity({ name, description })", () => {
-    xit("Creates and returns the new activity", async () => {
-      const activityToCreate = {
-        name: "Marathon",
-        description: "Run all the miles",
-      };
-      const createdActivity = await createActivity(activityToCreate);
-      expect(createdActivity.name).toBe(activityToCreate.name);
-      expect(createdActivity.description).toBe(activityToCreate.description);
     });
   });
 
