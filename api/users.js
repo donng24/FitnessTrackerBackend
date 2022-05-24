@@ -1,9 +1,10 @@
-const express = require('express');
+/* eslint-disable no-useless-catch */
+const express = require("express");
 const router = express.Router();
 
-// POST /api/users/login
-
 // POST /api/users/register
+
+// POST /api/users/login
 
 // GET /api/users/me
 
