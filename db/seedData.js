@@ -3,7 +3,19 @@
 const client = require("./client")
 
 async function dropTables() {
-  console.log("Dropping All Tables...")
+  try {
+    console.log("Dropping All Tables...")
+
+    await client.query(
+      'DROP TABLE IF EXISTS mytablename'
+    );
+
+    console.log("Finished dropping tables");
+  } catch (error) {
+    console.error("Error dropping tables");
+    throw error;
+  }
+  
   // drop all tables, in the correct order
 }
 
