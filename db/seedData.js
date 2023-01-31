@@ -22,23 +22,34 @@ async function createTables() {
   // create all tables, in the correct order
   try {
     await client.query(`
-  CREATE TABLE mytablename (
+  
+  CREATE TABLE users (
+    Id SERIAL PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
   );
-
   CREATE TABLE activities (
-    id SERIAL PRIMARY KEY,
+    Id SERIAL PRIMARY KEY,
     name VARCHAR(255) UNIQUE NOT NULL,
     description TEXT NOT NULL
   );
 
   CREATE TABLE routines (
-    id SERIAL PRIMARY KEY,
+    Id SERIAL PRIMARY KEY,
     "creatorId" INTEGER REFERENCES users(id),
     "isPublic" BOOLEAN DEFAULT false,
     name VARCHAR(255) UNIQUE NOT NULL,
     goal TEXT NOT NULL
     
   );
+
+  CREATE TABLE routine_activities (
+    Id SERIAL PRIMARY KEY,
+    "routineId" INTEGER REFERENCES ROUTINES ( Id ),
+    "activityId" INTEGER ROUTINES ( Id ),
+    duration INTEGER,
+    count INTEGER
+  )
 
   `);
 
