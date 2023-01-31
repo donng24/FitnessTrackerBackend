@@ -1,12 +1,23 @@
 // require in the database adapter functions as you write them (createUser, createActivity...)
-// const { } = require('./');
+const { createUser } = require('./users');
+const { createActivity } = require('./activities')
+const { createRoutine } = require('./routines')
+const { addActivityToRoutine } = require('./routine_activities')
+
 const client = require("./client");
 
 async function dropTables() {
   try {
     console.log("Dropping All Tables...");
 
-    await client.query("DROP TABLE IF EXISTS mytablename");
+    await client.query(`
+    DROP TABLE IF EXISTS routine_activities;
+    DROP TABLE IF EXISTS routines;
+    DROP TABLE IF EXISTS activities;
+    DROP TABLE IF EXISTS users;
+
+    
+    `);
 
     console.log("Finished dropping tables");
   } catch (error) {
@@ -23,33 +34,31 @@ async function createTables() {
   try {
     await client.query(`
   
-  CREATE TABLE users (
-    Id SERIAL PRIMARY KEY,
-    username VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL
-  );
-  CREATE TABLE activities (
-    Id SERIAL PRIMARY KEY,
-    name VARCHAR(255) UNIQUE NOT NULL,
-    description TEXT NOT NULL
-  );
-
-  CREATE TABLE routines (
-    Id SERIAL PRIMARY KEY,
-    "creatorId" INTEGER REFERENCES users(id),
-    "isPublic" BOOLEAN DEFAULT false,
-    name VARCHAR(255) UNIQUE NOT NULL,
-    goal TEXT NOT NULL
-    
-  );
-
-  CREATE TABLE routine_activities (
-    Id SERIAL PRIMARY KEY,
-    "routineId" INTEGER REFERENCES ROUTINES ( Id ),
-    "activityId" INTEGER ROUTINES ( Id ),
-    duration INTEGER,
-    count INTEGER
-  )
+    CREATE TABLE users (
+      id SERIAL PRIMARY KEY,
+      username VARCHAR(255) UNIQUE NOT NULL,
+      password VARCHAR(255) NOT NULL
+    );
+    CREATE TABLE activities (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) UNIQUE NOT NULL, 
+      description TEXT NOT NULL
+    );
+    CREATE TABLE routines (
+      id SERIAL PRIMARY KEY,
+      "creatorId" INTEGER REFERENCES users(Id),
+      "isPublic" BOOLEAN DEFAULT false, 
+      name VARCHAR(255) UNIQUE NOT NULL,
+      goal TEXT NOT NULL
+    ); 
+    CREATE TABLE routine_activities (
+      id SERIAL PRIMARY KEY,
+      "routineId" INTEGER REFERENCES routines(id),
+      "activityId" INTEGER REFERENCES activities(id),
+      duration INTEGER,
+      count INTEGER,
+      UNIQUE ("routineId", "activityId")
+    );
 
   `);
 
