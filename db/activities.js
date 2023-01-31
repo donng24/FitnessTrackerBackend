@@ -1,5 +1,5 @@
 const client = require('./client');
-
+ 
 // database functions
 async function createActivity({ name, description }) {
   // return the new activity
