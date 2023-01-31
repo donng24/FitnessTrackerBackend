@@ -17,7 +17,7 @@ async function createActivity({ name, description }) {
     );
     return activity;
   } catch (error) {
-    throw error;
+    console.log(error);
   }
 }
 
@@ -30,7 +30,7 @@ async function getAllActivities() {
     `);
     return rows;
   } catch (error) {
-    throw error;
+    console.log(error);
   }
 }
 
@@ -49,7 +49,7 @@ async function getActivityById(id) {
 
     return activity;
   } catch (error) {
-    throw error;
+    console.log(error);
   }
 }
 
@@ -68,7 +68,7 @@ async function getActivityByName(name) {
 
     return activity;
   } catch (error) {
-    throw error;
+    console.log(error);
   }
 }
 
