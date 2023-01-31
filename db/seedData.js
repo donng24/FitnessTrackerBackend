@@ -3,9 +3,6 @@
 const client = require("./client");
 
 async function dropTables() {
-<<<<<<< HEAD
-  console.log("Dropping All Tables...");
-=======
   try {
     console.log("Dropping All Tables...")
 
@@ -19,7 +16,6 @@ async function dropTables() {
     throw error;
   }
   
->>>>>>> 2821e62483943e45a97091b44fbfcb7385080c02
   // drop all tables, in the correct order
 }
 
