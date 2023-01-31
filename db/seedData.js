@@ -3,7 +3,23 @@
 const client = require("./client");
 
 async function dropTables() {
+<<<<<<< HEAD
   console.log("Dropping All Tables...");
+=======
+  try {
+    console.log("Dropping All Tables...")
+
+    await client.query(
+      'DROP TABLE IF EXISTS mytablename'
+    );
+
+    console.log("Finished dropping tables");
+  } catch (error) {
+    console.error("Error dropping tables");
+    throw error;
+  }
+  
+>>>>>>> 2821e62483943e45a97091b44fbfcb7385080c02
   // drop all tables, in the correct order
 }
 
@@ -13,9 +29,6 @@ async function createTables() {
   try {
     await client.query(`
   CREATE TABLE mytablename (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL
   );
 
   `);
