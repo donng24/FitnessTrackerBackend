@@ -15,7 +15,7 @@ async function createUser({ username, password }) {
       ON CONFLICT (username) DO NOTHING
       RETURNING *
       `,
-      [username, password]
+      [username, hashedPassword]
     );
     return user;
   } catch (error) {
@@ -28,6 +28,11 @@ async function getUser({ username, password }) {
   const hashedPassword = user.password;
 
   const isValid = await bcrypt.compare(password, hashedPassword);
+  if (isValid) {
+    return user;
+  } else {
+    return null;
+}
 }
 
 async function getUserById(userId) {}
