@@ -8,7 +8,9 @@ async function createUser({ username, password }) {
   const SALT_COUNT = 10;
   const hashedPassword = await bcrypt.hash(password, SALT_COUNT);
   try {
-    const {rows: [user]} = await client.query(
+    const {
+      rows: [user],
+    } = await client.query(
       `
       INSERT INTO users (username, password)
       VALUES ($1, $2)
@@ -29,19 +31,19 @@ async function getUser({ username, password }) {
   const hashedPassword = user.password;
 
   const isValid = await bcrypt.compare(password, hashedPassword);
+  user.password = null;
   if (isValid) {
     return user;
   } else {
     return null;
-}
+  }
 }
 
 async function getUserById(userId) {
   try {
-    const {rows: [user]} = await client.query(
-      `SELECT * FROM users WHERE id = $1`,
-      [userId]
-    );
+    const {
+      rows: [user],
+    } = await client.query(`SELECT * FROM users WHERE id = $1`, [userId]);
     user.password = null;
     return user;
   } catch (error) {
@@ -51,11 +53,11 @@ async function getUserById(userId) {
 
 async function getUserByUsername(userName) {
   try {
-    const {rows: [user]} = await client.query(
-      `SELECT * FROM users WHERE username = $1`,
-      [userName]
-    );
-    user.password = null;
+    const {
+      rows: [user],
+    } = await client.query(`SELECT * FROM users WHERE username = $1`, [
+      userName,
+    ]);
     return user;
   } catch (error) {
     console.error(error);
