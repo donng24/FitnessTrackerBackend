@@ -59,12 +59,13 @@ async function getAllRoutines() {
     `);
 
     const routineIds = routines.map((r) => r.id);
-    const { rows: routineActivities } = await client.query(`
-    SELECT * 
-    FROM routine_activities 
-    WHERE "routineId" 
-    in(${routineIds});
-    `);
+
+    // const { rows: routineActivities } = await client.query(`
+    // SELECT ra.*
+    // FROM routine_activities ra
+    // WHERE "routineId"
+    // in(${routineIds});
+    // `);
 
     return routines;
   } catch (error) {
