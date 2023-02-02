@@ -57,12 +57,22 @@ async function getAllRoutines() {
     JOIN users u 
     ON u.id = r."creatorId"
     `);
+
+    const routineIds = routines.map((r) => r.id);
+    const { rows: routineActivities } = await client.query(`
+    SELECT * 
+    FROM routine_activities 
+    WHERE "routineId" 
+    in(${routineIds});
+    `);
+
     return routines;
   } catch (error) {
     console.log(error);
   }
 }
-// SELECT a.name AS "activityName", r.name as "routineName", description, duration, count, username AS "creatorName" FROM routines r
+// SELECT a.name AS "activityName", r.name as "routineName", description, duration, count, username AS "creatorName"
+// FROM routines r
 // JOIN routine_activities ra
 // ON ra."routineId" = r.id
 // JOIN activites a
