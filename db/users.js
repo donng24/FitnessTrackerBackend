@@ -25,7 +25,7 @@ async function createUser({ username, password }) {
 }
 
 async function getUser({ username, password }) {
-  const user = await getUserByUserName(username);
+  const user = await getUserByUsername(username);
   const hashedPassword = user.password;
 
   const isValid = await bcrypt.compare(password, hashedPassword);
@@ -36,9 +36,31 @@ async function getUser({ username, password }) {
 }
 }
 
-async function getUserById(userId) {}
+async function getUserById(userId) {
+  try {
+    const {rows: [user]} = await client.query(
+      `SELECT * FROM users WHERE id = $1`,
+      [userId]
+    );
+    user.password = null;
+    return user;
+  } catch (error) {
+    console.error(error);
+  }
+}
 
-async function getUserByUsername(userName) {}
+async function getUserByUsername(userName) {
+  try {
+    const {rows: [user]} = await client.query(
+      `SELECT * FROM users WHERE username = $1`,
+      [userName]
+    );
+    user.password = null;
+    return user;
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 module.exports = {
   createUser,
