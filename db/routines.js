@@ -57,8 +57,8 @@ async function getAllRoutines() {
       JOIN users u 
       ON u.id = r."creatorId"
     `);
-    const routineIds = routines.map((routine) => routine.id);
-    const setString = routines.map((_, idx) => `$${idx + 1}`).join(", ");
+    const routineIds = routines.map((routine) => routine.id); //array of ids for each routine
+    const setString = routines.map((_, idx) => `$${idx + 1}`).join(", "); //($1,$2,$3... all the way to 62)
 
     const { rows: routineActivities } = await client.query(
       `
@@ -88,8 +88,14 @@ async function getAllRoutines() {
 // ON ra."activityId" = a.id
 // JOIN users u
 // ON u.id = "creatorId"
-async function getAllPublicRoutines() {}
-
+async function getAllPublicRoutines() {
+  try {
+    const routines = await getAllRoutines();
+    return routines.filter((routine) => routine.isPublic === true);
+  } catch (error) {
+    console.log(error);
+  }
+}
 async function getAllRoutinesByUser({ username }) {}
 
 async function getPublicRoutinesByUser({ username }) {}
