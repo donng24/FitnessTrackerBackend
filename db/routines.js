@@ -65,9 +65,8 @@ async function getAllRoutines() {
       JOIN routine_activities ra
       ON ra."activityId" = a.id
       WHERE ra."routineId" 
-      IN (${routines.map((key, idx) => `$${idx + 1}`).join(", ")})
-    `,
-      routineIds
+      IN (${routineIds})
+    `
     );
 
     return routines.map((r) => {
