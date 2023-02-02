@@ -2,7 +2,10 @@ const client = require("./client");
 
 async function createRoutine({ creatorId, isPublic, name, goal }) {
   try {
-    const {rows: [routine],} = await client.query(`
+    const {
+      rows: [routine],
+    } = await client.query(
+      `
     INSERT INTO routines ("creatorId", "isPublic", name, goal)
     VALUES ($1, $2, $3, $4)
     ON CONFLICT (name) DO NOTHING
@@ -15,7 +18,6 @@ async function createRoutine({ creatorId, isPublic, name, goal }) {
     console.log(error);
   }
 }
-
 
 async function getRoutineById(id) {}
 
@@ -34,15 +36,23 @@ async function getRoutinesWithoutActivities() {
 async function getAllRoutines() {
   try {
     const { rows: routines } = await client.query(`
-    SELECT *
-    FROM routines
+    SELECT r.*, u.username AS "creatorName"
+    FROM routines r
+    JOIN users u 
+    ON u.id = r."creatorId"
     `);
     return routines;
   } catch (error) {
     console.log(error);
   }
 }
-
+// SELECT a.name AS "activityName", r.name as "routineName", description, duration, count, username AS "creatorName" FROM routines r
+// JOIN routine_activities ra
+// ON ra."routineId" = r.id
+// JOIN activites a
+// ON ra."activityId" = a.id
+// JOIN users u
+// ON u.id = "creatorId"
 async function getAllPublicRoutines() {}
 
 async function getAllRoutinesByUser({ username }) {}
