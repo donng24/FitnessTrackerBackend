@@ -116,8 +116,9 @@ async function getPublicRoutinesByUser({ username }) {
 
 async function getPublicRoutinesByActivity({ id }) {
   try {
-    const sleepy = "will finish this tomorrow";
-    console.log(sleepy);
+    const routines = await getAllPublicRoutines();
+
+    return routines;
   } catch (error) {
     console.log(error);
   }
