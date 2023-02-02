@@ -115,7 +115,14 @@ async function getPublicRoutinesByUser({ username }) {
   }
 }
 
-async function getPublicRoutinesByActivity({ id }) {}
+async function getPublicRoutinesByActivity({ id }) {
+  try {
+    const sleepy = "will finish this tomorrow";
+    console.log(sleepy);
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 async function updateRoutine({ id, ...fields }) {
   const setString = Object.keys(fields)
