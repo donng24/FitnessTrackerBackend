@@ -128,16 +128,14 @@ async function destroyRoutine(id) {
     await client.query(
       `
     DELETE FROM routine_activities
-    WHERE "routineId"=$1;
-`,
+    WHERE "routineId"=$1;`,
       [id]
     );
 
     await client.query(
       `
     DELETE FROM routines
-    WHERE id=$1;
-`,
+    WHERE id=$1;`,
       [id]
     );
   } catch (error) {
