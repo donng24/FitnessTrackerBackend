@@ -58,8 +58,6 @@ async function getAllRoutines() {
       ON u.id = r."creatorId"
     `);
     const routineIds = routines.map((routine) => routine.id); //array of ids for each routine
-    const setString = routines.map((_, idx) => `$${idx + 1}`).join(", "); //($1,$2,$3... all the way to 62)
-
     const { rows: routineActivities } = await client.query(
       `
       SELECT a.*, ra.duration, ra.count, ra.id AS "routineActivityId", ra."routineId"
@@ -67,7 +65,7 @@ async function getAllRoutines() {
       JOIN routine_activities ra
       ON ra."activityId" = a.id
       WHERE ra."routineId" 
-      IN (${setString})
+      IN (${routines.map((key, idx) => `$${idx + 1}`).join(", ")})
     `,
       routineIds
     );
@@ -91,14 +89,31 @@ async function getAllRoutines() {
 async function getAllPublicRoutines() {
   try {
     const routines = await getAllRoutines();
+
     return routines.filter((routine) => routine.isPublic === true);
   } catch (error) {
     console.log(error);
   }
 }
-async function getAllRoutinesByUser({ username }) {}
+async function getAllRoutinesByUser({ username }) {
+  try {
+    const routines = await getAllRoutines();
 
-async function getPublicRoutinesByUser({ username }) {}
+    return routines.filter((routine) => routine.creatorName === username);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function getPublicRoutinesByUser({ username }) {
+  try {
+    const routines = await getAllRoutinesByUser({ username });
+
+    return routines.filter((routine) => routine.isPublic === true);
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 async function getPublicRoutinesByActivity({ id }) {}
 
