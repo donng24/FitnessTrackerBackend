@@ -37,7 +37,7 @@ const {
 
 describe("/api/users", () => {
   describe("POST /api/users/register", () => {
-    xit("Creates a new user.", async () => {
+    it("Creates a new user.", async () => {
       // Create some fake user data
       const fakeUserData = {
         username: faker.internet.userName(),
@@ -60,7 +60,7 @@ describe("/api/users", () => {
       });
     });
 
-    xit("EXTRA CREDIT: Hashes password before saving user to DB.", async () => {
+    it("EXTRA CREDIT: Hashes password before saving user to DB.", async () => {
       // Create some fake user data
       const fakeUserData = {
         username: faker.internet.userName(),
@@ -97,7 +97,7 @@ describe("/api/users", () => {
       );
     });
 
-    xit("Throws errors for duplicate username", async () => {
+    it("Throws errors for duplicate username", async () => {
       // Create a fake user in the DB
       const { fakeUser: firstUser } = await createFakeUserWithToken();
       // Now try to create a user with the same username
@@ -118,7 +118,7 @@ describe("/api/users", () => {
       );
     });
 
-    xit("returns error if password is less than 8 characters.", async () => {
+    it("returns error if password is less than 8 characters.", async () => {
       // Create some user data with a password with 7 characters
       const newUserShortPassword = {
         username: faker.internet.userName(),
@@ -134,7 +134,7 @@ describe("/api/users", () => {
   });
 
   describe("POST /api/users/login", () => {
-    xit("Logs in the user. Requires username and password, and verifies that hashed login password matches the saved hashed password.", async () => {
+    it("Logs in the user. Requires username and password, and verifies that hashed login password matches the saved hashed password.", async () => {
       // Create some fake user data
       const userData = {
         username: faker.internet.userName(),
@@ -156,7 +156,7 @@ describe("/api/users", () => {
       );
     });
 
-    xit("Logs in the user and returns the user back to us", async () => {
+    it("Logs in the user and returns the user back to us", async () => {
       // Create some fake user data
       const userData = {
         username: faker.internet.userName(),
@@ -177,7 +177,7 @@ describe("/api/users", () => {
       });
     });
 
-    xit("Returns a JSON Web Token. Stores the id and username in the token.", async () => {
+    it("Returns a JSON Web Token. Stores the id and username in the token.", async () => {
       const userData = {
         username: faker.internet.userName(),
         password: faker.internet.password(),
@@ -202,7 +202,7 @@ describe("/api/users", () => {
   });
 
   describe("GET /api/users/me", () => {
-    xit("sends back users data if valid token is supplied in header", async () => {
+    it("sends back users data if valid token is supplied in header", async () => {
       const { fakeUser, token } = await createFakeUserWithToken();
 
       const response = await request(app)
@@ -214,7 +214,7 @@ describe("/api/users", () => {
       expect(response.body).toEqual(objectContaining(fakeUser));
     });
 
-    xit("rejects requests with no valid token", async () => {
+    it("rejects requests with no valid token", async () => {
       const response = await request(app).get("/api/users/me");
 
       expect(response.status).toBe(401);
@@ -224,7 +224,7 @@ describe("/api/users", () => {
   });
 
   describe("GET /api/users/:username/routines", () => {
-    xit("Gets a list of public routines for a particular user.", async () => {
+    it("Gets a list of public routines for a particular user.", async () => {
       // Create a fake user with a bunch of routines associated
       const { fakeUser, token } = await createFakeUserWithRoutinesAndActivities(
         "Greg"
@@ -244,7 +244,7 @@ describe("/api/users", () => {
       expect(response.body).toEqual([...routinesFromDB]);
     });
 
-    xit("gets a list of all routines for the logged in user", async () => {
+    it("gets a list of all routines for the logged in user", async () => {
       const { fakeUser, token } = await createFakeUserWithRoutinesAndActivities(
         "Angela"
       );
