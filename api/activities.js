@@ -11,7 +11,7 @@ const {
 activitiesRouter.get("/", async (req, res, next) => {
   try {
     const activities = await getAllActivities();
-    res.send({ activities });
+    res.send(activities);
   } catch (error) {
     next(error);
   }
