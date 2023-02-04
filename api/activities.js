@@ -17,26 +17,12 @@ activitiesRouter.get("/", async (req, res, next) => {
   }
 });
 
-// GET /api/activities/:activityId/routines
-activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
-  const { activityId } = req.params;
-  try {
-    const publicRoutines = await getPublicRoutinesByActivity({
-      id: activityId,
-    });
-
-    res.send(publicRoutines);
-  } catch (error) {
-    next(error);
-  }
-});
-
 // POST /api/activities
 activitiesRouter.post("/", async (req, res, next) => {
   const { name, description } = req.body;
-  const data = {};
 
   try {
+    const data = {};
     data.name = name;
     data.description = description;
 
@@ -67,6 +53,20 @@ activitiesRouter.patch("/:activityId", async (req, res, next) => {
     });
 
     res.send(updatedActivity);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/activities/:activityId/routines
+activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
+  try {
+    const { activityId } = req.params;
+    const publicRoutines = await getPublicRoutinesByActivity({
+      id: activityId,
+    });
+
+    res.send(publicRoutines);
   } catch (error) {
     next(error);
   }
