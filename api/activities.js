@@ -18,28 +18,23 @@ activitiesRouter.get("/", async (req, res, next) => {
 });
 
 // POST /api/activities
-activitiesRouter.post("/", async (req, res, next) => {
-  const { name, description } = req.body;
-
-  try {
-    const data = {};
-    data.name = name;
-    data.description = description;
-
-    const addActivity = await createActivity(data);
-
-    if (addActivity) {
-      res.send(addActivity);
-    } else {
-      next({
-        name: "InvalidPostFormat",
-        message: "Post is missing data",
-      });
+  activitiesRouter.post("/", async (req, res, next) => {
+    try {
+      if (!req.user) {
+        next({
+          name: "UserAuthorizationError",
+          message: "Please log in to create an activity.",
+        });
+      } else {
+        const { name, description } = req.body;
+        const newActivity = await createActivity({ name, description });
+        res.send(newActivity);
+      }
+    } catch ({ name, message }) {
+      next({ name, message });
     }
-  } catch (error) {
-    next(error);
-  }
-});
+  });
+  
 
 // PATCH /api/activities/:activityId
 activitiesRouter.patch("/:activityId", async (req, res, next) => {
@@ -60,15 +55,25 @@ activitiesRouter.patch("/:activityId", async (req, res, next) => {
 
 // GET /api/activities/:activityId/routines
 activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
-  try {
-    const { activityId } = req.params;
-    const publicRoutines = await getPublicRoutinesByActivity({
-      id: activityId,
-    });
+  const { activityId } = req.params;
 
-    res.send(publicRoutines);
-  } catch (error) {
-    next(error);
+  try {
+    if (!activityId) {
+      return;
+    }
+    const id = activityId;
+    const routines = await getPublicRoutinesByActivity({ id });
+    if (routines.length <= 0) {
+      next({
+        name: "NoResultsFoundError",
+        message: "There are no routines associated with that activity.",
+      });
+    } else {
+      res.send(routines);
+    }
+  } catch ({ name, message }) {
+    console.error({ name, message });
+    next({ name, message });
   }
 });
 
