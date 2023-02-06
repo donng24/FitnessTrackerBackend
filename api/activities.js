@@ -5,6 +5,7 @@ const {
   getPublicRoutinesByActivity,
   createActivity,
   updateActivity,
+  getActivityById,
 } = require("../db");
 
 // GET /api/activities
@@ -18,23 +19,22 @@ activitiesRouter.get("/", async (req, res, next) => {
 });
 
 // POST /api/activities
-  activitiesRouter.post("/", async (req, res, next) => {
-    try {
-      if (!req.user) {
-        next({
-          name: "UserAuthorizationError",
-          message: "Please log in to create an activity.",
-        });
-      } else {
-        const { name, description } = req.body;
-        const newActivity = await createActivity({ name, description });
-        res.send(newActivity);
-      }
-    } catch ({ name, message }) {
-      next({ name, message });
+activitiesRouter.post("/", async (req, res, next) => {
+  try {
+    if (!req.user) {
+      next({
+        name: "UserAuthorizationError",
+        message: "Please log in to create an activity.",
+      });
+    } else {
+      const { name, description } = req.body;
+      const newActivity = await createActivity({ name, description });
+      res.send(newActivity);
     }
-  });
-  
+  } catch ({ name, message }) {
+    next({ name, message });
+  }
+});
 
 // PATCH /api/activities/:activityId
 activitiesRouter.patch("/:activityId", async (req, res, next) => {
@@ -56,24 +56,12 @@ activitiesRouter.patch("/:activityId", async (req, res, next) => {
 // GET /api/activities/:activityId/routines
 activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
   const { activityId } = req.params;
-
   try {
-    if (!activityId) {
-      return;
-    }
-    const id = activityId;
-    const routines = await getPublicRoutinesByActivity({ id });
-    if (routines.length <= 0) {
-      next({
-        name: "NoResultsFoundError",
-        message: "There are no routines associated with that activity.",
-      });
-    } else {
-      res.send(routines);
-    }
-  } catch ({ name, message }) {
-    console.error({ name, message });
-    next({ name, message });
+    const activity = await getActivityById(activityId);
+    const routines = await getPublicRoutinesByActivity(activity);
+    res.send(routines);
+  } catch (error) {
+    next(error);
   }
 });
 

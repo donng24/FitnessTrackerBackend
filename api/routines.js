@@ -1,12 +1,14 @@
 const express = require("express");
+const routinesRouter = express.Router();
 const {
   getAllPublicRoutines,
   createRoutine,
   getRoutineById,
   destroyRoutine,
   addActivityToRoutine,
+  updateRoutine,
 } = require("../db");
-const routinesRouter = express.Router();
+const { requireUser } = require("./utils");
 
 // GET /api/routines
 routinesRouter.get("/", async (req, res, next) => {
@@ -33,8 +35,17 @@ routinesRouter.post("/", async (req, res, next) => {
 });
 
 // PATCH /api/routines/:routineId
-routinesRouter.patch("/:routineId", async (req, res, next) => {});
+routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
+  try {
+    const { routineId } = req.params;
 
+    const routine = await updateRoutine({ id: routineId, ...req.body });
+
+    res.send(routine);
+  } catch (error) {
+    next(error);
+  }
+});
 // DELETE /api/routines/:routineId
 routinesRouter.delete("/:routineId", async (req, res, next) => {
   try {
@@ -58,9 +69,9 @@ routinesRouter.delete("/:routineId", async (req, res, next) => {
 
 routinesRouter.post("/:routineId/activities", async (req, res, next) => {
   try {
-    const { activityId, count, duration } = req.body;
     const { routineId } = req.params;
-    
+    const { activityId, count, duration } = req.body;
+
     const routineActivityAttach = await addActivityToRoutine({
       routineId,
       activityId,
