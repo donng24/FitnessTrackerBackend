@@ -3,12 +3,9 @@ const jwt = require("jsonwebtoken");
 const express = require("express");
 const usersRouter = express.Router();
 const bcrypt = require("bcrypt");
-const { requireUser } = require("./utils");
-const { UserDoesNotExistError } = require("../errors");
 const { createUser, getUserByUsername, getUser } = require("../db/users");
 
-const { JWT_SECRET } = process.env;
-const users = [];
+const { getPublicRoutinesByUser } = require("../db/routines");
 
 // POST /api/users/register
 usersRouter.post("/register", async (req, res, next) => {
@@ -46,6 +43,7 @@ usersRouter.post("/register", async (req, res, next) => {
 usersRouter.post("/login", async (req, res, next) => {
   const { username, password } = req.body;
   if (!username || !password) {
+    res.status(401);
     next({
       name: "MissingCredentialsError",
       message: "Please supply both a username and password",
@@ -68,26 +66,22 @@ usersRouter.post("/login", async (req, res, next) => {
   }
 });
 // GET /api/users/me
-usersRouter.get("/me", async (req, res, next) => {
+
+usersRouter.get("/me", (req, res, next) => {
   try {
-    if (!req.user) {
-      next({
-        name: "Authorization error",
-        message: "You must be logged in to perform the task",
-      });
-    } else {
-      res.send(req.user);
-    }
-  } catch ({ name, message }) {
-    next({ name, message });
+    res.status(401);
+    res.send(req.user);
+  } catch (error) {
+    next(error);
   }
 });
 
 // GET /api/users/:username/routines
-
-usersRouter.get("/me", requireUser, async (req, res, next) => {
+usersRouter.get("/:username/routines", async (req, res, next) => {
+  const { username } = req.params;
   try {
-    res.send(req.user);
+    const routines = await getPublicRoutinesByUser({ username });
+    res.send(routines);
   } catch (error) {
     next(error);
   }
