@@ -5,7 +5,11 @@ const usersRouter = express.Router();
 const bcrypt = require("bcrypt");
 const { createUser, getUserByUsername, getUser } = require("../db/users");
 
-const { getPublicRoutinesByUser } = require("../db/routines");
+const {
+  getPublicRoutinesByUser,
+  getAllRoutinesByUser,
+} = require("../db/routines");
+const { requireUser } = require("./utils");
 
 // POST /api/users/register
 usersRouter.post("/register", async (req, res, next) => {
@@ -67,9 +71,8 @@ usersRouter.post("/login", async (req, res, next) => {
 });
 // GET /api/users/me
 
-usersRouter.get("/me", (req, res, next) => {
+usersRouter.get("/me", requireUser, (req, res, next) => {
   try {
-    res.status(401);
     res.send(req.user);
   } catch (error) {
     next(error);
@@ -86,5 +89,4 @@ usersRouter.get("/:username/routines", async (req, res, next) => {
     next(error);
   }
 });
-
 module.exports = usersRouter;
