@@ -1,12 +1,15 @@
 /* eslint-disable no-useless-catch */
 const express = require("express");
-const router = express.Router();
+const usersRouter = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { UserDoesNotExistError } = require("../errors");
 
+const { JWT_SECRET } = process.env
 const users = [];
+
 // POST /api/users/register
-router.post('/register', async (req, res) => {
+usersRouter.post('/register', async (req, res) => {
     const { username, password } = req.body;
         if (!username || !password) {
         return res.status(400).send({ error: 'Username and password are required' });
@@ -25,11 +28,13 @@ router.post('/register', async (req, res) => {
     const user = { username, password: hashedPassword };
     users.push(user);
     
-    res.send({ message: 'User created successfully' });
+
+    const token = jwt.sign({ username }, {JWT_SECRET});
+    res.send({ message: 'User created successfully', token });
   });
       
 // POST /api/users/login
-router.post('/login', async (req, res) => {
+usersRouter.post('/login', async (req, res) => {
     const { username, password } = req.body;
         if (!username || !password) {
         return res.status(400).send({ error: 'Username and password are required' });
@@ -50,7 +55,26 @@ router.post('/login', async (req, res) => {
     res.send({ user, token });
   });
 // GET /api/users/me
+usersRouter.get('/me', async (req, res, next) => {
+    try {
+        if (!req.user){
+            next({
+                name: "Authorization error", 
+                message: "You must be logged in to perform the task"
+            });
+        }else{
+            res.send(req.user);
+        }
+    } catch ({name, message}) {
+        next({name, message})
+    }
+}
+)
+
+
+
+
 
 // GET /api/users/:username/routines
 
-module.exports = router;
+module.exports = usersRouter;
