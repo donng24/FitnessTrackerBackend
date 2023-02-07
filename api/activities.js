@@ -9,6 +9,8 @@ const {
   getActivityByName,
 } = require("../db");
 
+const { requireUser } = require("./utils");
+
 // GET /api/activities
 activitiesRouter.get("/", async (req, res, next) => {
   try {
@@ -40,17 +42,32 @@ activitiesRouter.post("/", async (req, res, next) => {
 });
 
 // PATCH /api/activities/:activityId
-activitiesRouter.patch("/:activityId", async (req, res, next) => {
+activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
   const { activityId } = req.params;
   const { name, description } = req.body;
+  const activity = await getActivityById(activityId);
   try {
-    const updatedActivity = await updateActivity({
-      id: activityId,
-      name,
-      description,
-    });
+    if (!activity) {
+      next({
+        error: "Error",
+        message: "Activity 10000 not found",
+        name: "Error",
+      });
+    } else if (activity) {
+      next({
+        error: "Error",
+        message: "An activity with name Aerobics already exists",
+        name: "Error",
+      });
+    } else {
+      const updatedActivity = await updateActivity({
+        id: activityId,
+        name,
+        description,
+      });
 
-    res.send(updatedActivity);
+      res.send(updatedActivity);
+    }
   } catch (error) {
     next(error);
   }
