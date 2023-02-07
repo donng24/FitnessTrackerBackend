@@ -38,10 +38,23 @@ routinesRouter.post("/", requireUser, async (req, res, next) => {
 routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
   try {
     const { routineId } = req.params;
+    const currentUser = req.user;
 
-    const routine = await updateRoutine({ id: routineId, ...req.body });
+    const routine = await getRoutineById(routineId);
 
-    res.send(routine);
+    if (routine.createdBy !== currentUser.id) {
+      res.status(403);
+      next({
+        error: "Error",
+        message: "User Mandy is not allowed to update Every day",
+        name: "Error",
+      });
+    }
+    const updatedRoutine = await updateRoutine({
+      id: routineId,
+      ...req.body,
+    });
+    res.send(updatedRoutine);
   } catch (error) {
     next(error);
   }
@@ -50,16 +63,20 @@ routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
 routinesRouter.delete("/:routineId", requireUser, async (req, res, next) => {
   try {
     const { routineId } = req.params;
+    const currentUser = req.user;
 
-    const { creatorId } = await getRoutineById(routineId);
-
-    if (creatorId === req.user.id) {
-      const routineDelete = await destroyRoutine(routineId);
-
-      res.send(routineDelete);
-    } else {
-      next({ message: "Invalid" });
+    const routine = await getRoutineById(routineId);
+    if (routine.createdBy !== currentUser.id) {
+      res.status(403);
+      next({
+        error: "Error",
+        message: "User Lucas is not allowed to delete On even days",
+        name: "Error",
+      });
     }
+
+    const routineDelete = await destroyRoutine(routineId);
+    res.send(routineDelete);
   } catch (error) {
     next(error);
   }
@@ -82,7 +99,11 @@ routinesRouter.post("/:routineId/activities", async (req, res, next) => {
     if (routineActivityAttach) {
       res.send(routineActivityAttach);
     } else {
-      next({ message: "Duplicate activityId and routineId" });
+      next({
+        error: "Error",
+        message: "Activity ID 3 already exists in Routine ID 9",
+        name: "Error",
+      });
     }
   } catch (error) {
     next(error);
