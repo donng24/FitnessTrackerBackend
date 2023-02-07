@@ -53,21 +53,24 @@ activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
         message: "Activity 10000 not found",
         name: "Error",
       });
-    } else if (activity) {
+    }
+
+    const existingActivity = await getActivityByName(name);
+    if (existingActivity && existingActivity.id !== activityId) {
       next({
         error: "Error",
         message: "An activity with name Aerobics already exists",
         name: "Error",
       });
-    } else {
-      const updatedActivity = await updateActivity({
-        id: activityId,
-        name,
-        description,
-      });
-
-      res.send(updatedActivity);
     }
+
+    const updatedActivity = await updateActivity({
+      id: activityId,
+      name,
+      description,
+    });
+
+    res.send(updatedActivity);
   } catch (error) {
     next(error);
   }
