@@ -31,8 +31,8 @@ activitiesRouter.post("/", async (req, res, next) => {
       const newActivity = await createActivity({ name, description });
       res.send(newActivity);
     }
-  } catch ({ name, message }) {
-    next({ name, message });
+  } catch (error) {
+    next(error);
   }
 });
 
@@ -56,10 +56,18 @@ activitiesRouter.patch("/:activityId", async (req, res, next) => {
 // GET /api/activities/:activityId/routines
 activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
   const { activityId } = req.params;
+  const activity = await getActivityById(activityId);
   try {
-    const activity = await getActivityById(activityId);
-    const routines = await getPublicRoutinesByActivity(activity);
-    res.send(routines);
+    if (!activity) {
+      next({
+        error: "ActivityNotFoundError",
+        message: "Activity 10000 not found",
+        name: "ActivityNotFoundError",
+      });
+    } else {
+      const routines = await getPublicRoutinesByActivity(activity);
+      res.send(routines);
+    }
   } catch (error) {
     next(error);
   }
