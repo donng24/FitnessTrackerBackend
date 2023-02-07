@@ -6,6 +6,7 @@ const {
   createActivity,
   updateActivity,
   getActivityById,
+  getActivityByName,
 } = require("../db");
 
 // GET /api/activities
@@ -21,13 +22,15 @@ activitiesRouter.get("/", async (req, res, next) => {
 // POST /api/activities
 activitiesRouter.post("/", async (req, res, next) => {
   try {
-    if (!req.user) {
+    const { name, description } = req.body;
+    const activity = await getActivityByName(name);
+    if (activity) {
       next({
-        name: "UserAuthorizationError",
-        message: "Please log in to create an activity.",
+        error: "Error",
+        message: "An activity with name Push Ups already exists",
+        name: "Error",
       });
     } else {
-      const { name, description } = req.body;
       const newActivity = await createActivity({ name, description });
       res.send(newActivity);
     }
