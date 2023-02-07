@@ -82,11 +82,19 @@ usersRouter.get("/me", requireUser, (req, res, next) => {
 // GET /api/users/:username/routines
 usersRouter.get("/:username/routines", async (req, res, next) => {
   const { username } = req.params;
+  const user = await getUserByUsername(username);
   try {
-    const user = await getUserByUsername(username);
-    const routine = await getPublicRoutinesByUser(user);
-    if (user) {
-      res.send(routine);
+    if (!user) {
+      next({
+        name: "User Doesn't Exist",
+        message: "User Doesn't Exist",
+      });
+    } else if (user.id === req.user.id) {
+      const routinesByUser = await getAllRoutinesByUser({ username });
+      res.send(routinesByUser);
+    } else {
+      const publicRoutinesByUser = await getPublicRoutinesByUser({ username });
+      res.send(publicRoutinesByUser);
     }
   } catch (error) {
     next(error);
