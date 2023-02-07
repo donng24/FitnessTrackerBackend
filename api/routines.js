@@ -21,7 +21,7 @@ routinesRouter.get("/", async (req, res, next) => {
 });
 
 // POST /api/routines
-routinesRouter.post("/", async (req, res, next) => {
+routinesRouter.post("/", requireUser, async (req, res, next) => {
   const { id } = req.user;
   const { isPublic, name, goal } = req.body;
 
@@ -47,7 +47,7 @@ routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
   }
 });
 // DELETE /api/routines/:routineId
-routinesRouter.delete("/:routineId", async (req, res, next) => {
+routinesRouter.delete("/:routineId", requireUser, async (req, res, next) => {
   try {
     const { routineId } = req.params;
 
