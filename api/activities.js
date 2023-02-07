@@ -5,6 +5,7 @@ const {
   getPublicRoutinesByActivity,
   createActivity,
   updateActivity,
+  getActivityById,
 } = require("../db");
 
 // GET /api/activities
@@ -17,41 +18,21 @@ activitiesRouter.get("/", async (req, res, next) => {
   }
 });
 
-// GET /api/activities/:activityId/routines
-activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
-  const { activityId } = req.params;
-  try {
-    const publicRoutines = await getPublicRoutinesByActivity({
-      id: activityId,
-    });
-
-    res.send(publicRoutines);
-  } catch (error) {
-    next(error);
-  }
-});
-
 // POST /api/activities
 activitiesRouter.post("/", async (req, res, next) => {
-  const { name, description } = req.body;
-  const data = {};
-
   try {
-    data.name = name;
-    data.description = description;
-
-    const addActivity = await createActivity(data);
-
-    if (addActivity) {
-      res.send(addActivity);
-    } else {
+    if (!req.user) {
       next({
-        name: "InvalidPostFormat",
-        message: "Post is missing data",
+        name: "UserAuthorizationError",
+        message: "Please log in to create an activity.",
       });
+    } else {
+      const { name, description } = req.body;
+      const newActivity = await createActivity({ name, description });
+      res.send(newActivity);
     }
-  } catch (error) {
-    next(error);
+  } catch ({ name, message }) {
+    next({ name, message });
   }
 });
 
@@ -67,6 +48,18 @@ activitiesRouter.patch("/:activityId", async (req, res, next) => {
     });
 
     res.send(updatedActivity);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /api/activities/:activityId/routines
+activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
+  const { activityId } = req.params;
+  try {
+    const activity = await getActivityById(activityId);
+    const routines = await getPublicRoutinesByActivity(activity);
+    res.send(routines);
   } catch (error) {
     next(error);
   }
