@@ -46,7 +46,7 @@ routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
       res.status(403);
       next({
         error: "Error",
-        message: "User Mandy is not allowed to update Every day",
+        message: `User ${req.user.username} is not allowed to update Every day`,
         name: "Error",
       });
     }
@@ -70,7 +70,7 @@ routinesRouter.delete("/:routineId", requireUser, async (req, res, next) => {
       res.status(403);
       next({
         error: "Error",
-        message: "User Lucas is not allowed to delete On even days",
+        message: `User ${req.user.username} is not allowed to delete On even days`,
         name: "Error",
       });
     }
@@ -101,7 +101,7 @@ routinesRouter.post("/:routineId/activities", async (req, res, next) => {
     } else {
       next({
         error: "Error",
-        message: "Activity ID 3 already exists in Routine ID 9",
+        message: `Activity ID ${activityId} already exists in Routine ID ${routineId}`,
         name: "Error",
       });
     }
