@@ -42,7 +42,13 @@ routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
 
     const routine = await getRoutineById(routineId);
 
-    if (routine.createdBy !== currentUser.id) {
+    if (routine && routine.creatorId === req.user.id) {
+      const updatedRoutine = await updateRoutine({
+        id: routineId,
+        ...req.body,
+      });
+      res.send(updatedRoutine);
+    } else if (routine.createdBy !== currentUser.id) {
       res.status(403);
       next({
         error: "Error",
@@ -50,11 +56,6 @@ routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
         name: "Error",
       });
     }
-    const updatedRoutine = await updateRoutine({
-      id: routineId,
-      ...req.body,
-    });
-    res.send(updatedRoutine);
   } catch (error) {
     next(error);
   }
