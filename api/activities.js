@@ -29,7 +29,7 @@ activitiesRouter.post("/", async (req, res, next) => {
     if (activity) {
       next({
         error: "Error",
-        message: "An activity with name Push Ups already exists",
+        message: `An activity with name ${name} already exists`,
         name: "Error",
       });
     } else {
@@ -50,7 +50,7 @@ activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
     if (!activity) {
       next({
         error: "Error",
-        message: "Activity 10000 not found",
+        message: `Activity ${activityId} not found`,
         name: "Error",
       });
     }
@@ -59,7 +59,7 @@ activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
     if (existingActivity && existingActivity.id !== activityId) {
       next({
         error: "Error",
-        message: "An activity with name Aerobics already exists",
+        message: `An activity with name ${name} already exists`,
         name: "Error",
       });
     }
@@ -84,7 +84,7 @@ activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
     if (!activity) {
       next({
         error: "ActivityNotFoundError",
-        message: "Activity 10000 not found",
+        message: `Activity ${activityId} not found`,
         name: "ActivityNotFoundError",
       });
     } else {
