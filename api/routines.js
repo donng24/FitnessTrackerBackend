@@ -66,7 +66,10 @@ routinesRouter.delete("/:routineId", requireUser, async (req, res, next) => {
     const currentUser = req.user;
 
     const routine = await getRoutineById(routineId);
-    if (routine.createdBy !== currentUser.id) {
+    if (routine && routine.creatorId === req.user.id) {
+      const routineDelete = await destroyRoutine(routineId);
+      res.send({ routineDelete, ...routine });
+    } else if (routine.createdBy !== currentUser.id) {
       res.status(403);
       next({
         error: "Error",
@@ -74,9 +77,6 @@ routinesRouter.delete("/:routineId", requireUser, async (req, res, next) => {
         name: "Error",
       });
     }
-
-    const routineDelete = await destroyRoutine(routineId);
-    res.send(routineDelete);
   } catch (error) {
     next(error);
   }
