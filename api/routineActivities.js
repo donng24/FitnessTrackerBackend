@@ -5,11 +5,7 @@ const jwt = require('jsonwebtoken')
 const { JWT_SECRET } = process.env;
 const {
   getRoutineActivityById,
-  addActivityToRoutine,
-  getRoutineActivitiesByRoutine,
-  updateRoutineActivity,
   destroyRoutineActivity,
-  canEditRoutineActivity,
   } = require("../db");
 // PATCH /api/routine_activities/:routineActivityId
 routineActivitiesRouter.patch('/:routineActivityId', (req, res, next) => {
@@ -27,10 +23,10 @@ routineActivitiesRouter.delete('/:routineActivityId', async (req, res, next) => 
       const routineActivity = await getRoutineActivityById(routineActivityId);
         if (routineActivity.id !== userId) {
         return res.status(401).send({ 
-            activityId: activityId
-            count: count
-            duration: duration
-            id: id
+            activityId: activityId,
+            count: count,
+            duration: duration,
+            id: id,
             routineId: routineId
          });
       }
