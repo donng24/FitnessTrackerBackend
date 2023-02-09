@@ -3,12 +3,13 @@ const jwt = require("jsonwebtoken");
 const express = require("express");
 const usersRouter = express.Router();
 const bcrypt = require("bcrypt");
-const { requireUser } = require("./utils");
-const { UserDoesNotExistError } = require("../errors");
 const { createUser, getUserByUsername, getUser } = require("../db/users");
 
-const { JWT_SECRET } = process.env;
-const users = [];
+const {
+  getPublicRoutinesByUser,
+  getAllRoutinesByUser,
+} = require("../db/routines");
+const { requireUser } = require("./utils");
 
 // POST /api/users/register
 usersRouter.post("/register", async (req, res, next) => {
@@ -46,6 +47,7 @@ usersRouter.post("/register", async (req, res, next) => {
 usersRouter.post("/login", async (req, res, next) => {
   const { username, password } = req.body;
   if (!username || !password) {
+    res.status(401);
     next({
       name: "MissingCredentialsError",
       message: "Please supply both a username and password",
@@ -68,24 +70,8 @@ usersRouter.post("/login", async (req, res, next) => {
   }
 });
 // GET /api/users/me
-usersRouter.get("/me", async (req, res, next) => {
-  try {
-    if (!req.user) {
-      next({
-        name: "Authorization error",
-        message: "You must be logged in to perform the task",
-      });
-    } else {
-      res.send(req.user);
-    }
-  } catch ({ name, message }) {
-    next({ name, message });
-  }
-});
 
-// GET /api/users/:username/routines
-
-usersRouter.get("/me", requireUser, async (req, res, next) => {
+usersRouter.get("/me", requireUser, (req, res, next) => {
   try {
     res.send(req.user);
   } catch (error) {
@@ -93,4 +79,25 @@ usersRouter.get("/me", requireUser, async (req, res, next) => {
   }
 });
 
+// GET /api/users/:username/routines
+usersRouter.get("/:username/routines", async (req, res, next) => {
+  const { username } = req.params;
+  const user = await getUserByUsername(username);
+  try {
+    if (!user) {
+      next({
+        name: "User Doesn't Exist",
+        message: "User Doesn't Exist",
+      });
+    } else if (user.id === req.user.id) {
+      const routinesByUser = await getAllRoutinesByUser({ username });
+      res.send(routinesByUser);
+    } else {
+      const publicRoutinesByUser = await getPublicRoutinesByUser({ username });
+      res.send(publicRoutinesByUser);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 module.exports = usersRouter;

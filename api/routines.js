@@ -21,7 +21,7 @@ routinesRouter.get("/", async (req, res, next) => {
 });
 
 // POST /api/routines
-routinesRouter.post("/", async (req, res, next) => {
+routinesRouter.post("/", requireUser, async (req, res, next) => {
   const { id } = req.user;
   const { isPublic, name, goal } = req.body;
 
@@ -38,27 +38,45 @@ routinesRouter.post("/", async (req, res, next) => {
 routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
   try {
     const { routineId } = req.params;
+    const currentUser = req.user;
 
-    const routine = await updateRoutine({ id: routineId, ...req.body });
+    const routine = await getRoutineById(routineId);
 
-    res.send(routine);
+    if (routine && routine.creatorId === req.user.id) {
+      const updatedRoutine = await updateRoutine({
+        id: routineId,
+        ...req.body,
+      });
+      res.send(updatedRoutine);
+    } else if (routine.createdBy !== currentUser.id) {
+      res.status(403);
+      next({
+        error: "Error",
+        message: `User ${req.user.username} is not allowed to update Every day`,
+        name: "Error",
+      });
+    }
   } catch (error) {
     next(error);
   }
 });
 // DELETE /api/routines/:routineId
-routinesRouter.delete("/:routineId", async (req, res, next) => {
+routinesRouter.delete("/:routineId", requireUser, async (req, res, next) => {
   try {
     const { routineId } = req.params;
+    const currentUser = req.user;
 
-    const { creatorId } = await getRoutineById(routineId);
-
-    if (creatorId === req.user.id) {
+    const routine = await getRoutineById(routineId);
+    if (routine && routine.creatorId === req.user.id) {
       const routineDelete = await destroyRoutine(routineId);
-
-      res.send(routineDelete);
-    } else {
-      next({ message: "Invalid" });
+      res.send({ routineDelete, ...routine });
+    } else if (routine.createdBy !== currentUser.id) {
+      res.status(403);
+      next({
+        error: "Error",
+        message: `User ${req.user.username} is not allowed to delete On even days`,
+        name: "Error",
+      });
     }
   } catch (error) {
     next(error);
@@ -82,7 +100,11 @@ routinesRouter.post("/:routineId/activities", async (req, res, next) => {
     if (routineActivityAttach) {
       res.send(routineActivityAttach);
     } else {
-      next({ message: "Duplicate activityId and routineId" });
+      next({
+        error: "Error",
+        message: `Activity ID ${activityId} already exists in Routine ID ${routineId}`,
+        name: "Error",
+      });
     }
   } catch (error) {
     next(error);

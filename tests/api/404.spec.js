@@ -8,7 +8,7 @@ const request = require("supertest");
 const app = require("../../app");
 
 describe("/api/unknown", () => {
-  xit("should return a 404", async (done) => {
+  it("should return a 404", async (done) => {
     const response = await request(app).get("/api/unknown");
     expect(response.status).toEqual(404);
     // the 404 response returns an object with a message property
