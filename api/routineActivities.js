@@ -6,7 +6,6 @@ const { JWT_SECRET } = process.env;
 const {
   getRoutineActivityById,
   destroyRoutineActivity,
-  canEditRoutineActivity,
   getRoutineById,
   updateRoutineActivity,
 } = require("../db");
@@ -17,26 +16,25 @@ routineActivitiesRouter.patch(
   "/:routineActivityId",
   requireUser,
   async (req, res, next) => {
-    console.log(req.params);
     try {
       const { routineActivityId } = req.params;
 
       const routineActivity = await getRoutineActivityById(routineActivityId);
-      if (routineActivity.createdBy !== req.user.id) {
+      const routine = await getRoutineById(routineActivity.routineId);
+      if (routine.creatorId !== req.user.id) {
         res.status(403);
         next({
           error: "Error",
           message: `User ${req.user.username} is not allowed to update In the evening`,
           name: "Error",
         });
-      } else {
-        const updatedRoutineActivity = await updateRoutineActivity({
-          id: routineActivityId,
-          ...req.body,
-        });
-        if (updatedRoutineActivity) {
-          res.send(updatedRoutineActivity);
-        }
+      }
+      const updatedRoutineActivity = await updateRoutineActivity({
+        id: routineActivityId,
+        ...req.body,
+      });
+      if (updatedRoutineActivity) {
+        res.send(updatedRoutineActivity);
       }
     } catch (error) {
       next(error);
