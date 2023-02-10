@@ -9,7 +9,31 @@ const {
   canEditRoutineActivity,
 } = require("../db");
 // PATCH /api/routine_activities/:routineActivityId
-routineActivitiesRouter.patch("/:routineActivityId", (req, res, next) => {});
+routineActivitiesRouter.patch("/:routineActivityId", async (req, res, next) => { 
+  try {
+  const { routineActivityId } = req.params;
+  const currentUser = req.user;
+
+  const routineActivity = await getRoutineActivityById(routineActivityId);
+
+  if (routineActivity && routineActivity.creatorId === req.user.id) {
+    const updatedRoutineActivity = await updateRoutineActivity({
+      id: routineId,
+      ...req.body,
+    });
+    res.send(updatedRoutineActivity);
+  } else if (routineActivity.createdBy !== currentUser.id) {
+    res.status(403);
+    next({
+      error: "Error",
+      message: `User ${req.user.username} is not allowed to update Every day`,
+      name: "Error",
+    });
+  }
+} catch (error) {
+  next(error);
+}
+});
 // DELETE /api/routine_activities/:routineActivityId
 routineActivitiesRouter.delete(
   "/:routineActivityId",
