@@ -7,56 +7,60 @@ const {
   getRoutineActivityById,
   destroyRoutineActivity,
   canEditRoutineActivity,
+  getRoutineById,
 } = require("../db");
+const { UnauthorizedDeleteError } = require("../errors");
+const { requireUser } = require("./utils");
 // PATCH /api/routine_activities/:routineActivityId :)
-routineActivitiesRouter.patch("/:routineActivityId", async (req, res, next) => { 
+routineActivitiesRouter.patch("/:routineActivityId", async (req, res, next) => {
   try {
-  const { routineActivityId } = req.params;
-  const currentUser = req.user;
+    const { routineActivityId } = req.params;
+    const currentUser = req.user;
 
-  const routineActivity = await getRoutineActivityById(routineActivityId);
+    const routineActivity = await getRoutineActivityById(routineActivityId);
 
-  if (routineActivity && routineActivity.creatorId === req.user.id) {
-    const updatedRoutineActivity = await updateRoutineActivity({
-      id: routineId,
-      ...req.body,
-    });
-    res.send(updatedRoutineActivity);
-  } else if (routineActivity.createdBy !== currentUser.id) {
-    res.status(403);
-    next({
-      error: "Error",
-      message: `User ${req.user.username} is not allowed to update Every day`,
-      name: "Error",
-    });
+    if (routineActivity && routineActivity.creatorId === req.user.id) {
+      const updatedRoutineActivity = await updateRoutineActivity({
+        id: routineId,
+        ...req.body,
+      });
+      res.send(updatedRoutineActivity);
+    } else if (routineActivity.createdBy !== currentUser.id) {
+      res.status(403);
+      next({
+        error: "Error",
+        message: `User ${req.user.username} is not allowed to update Every day`,
+        name: "Error",
+      });
+    }
+  } catch (error) {
+    next(error);
   }
-} catch (error) {
-  next(error);
-}
 });
 // DELETE /api/routine_activities/:routineActivityId
 routineActivitiesRouter.delete(
   "/:routineActivityId",
+  requireUser,
   async (req, res, next) => {
     try {
-      const token = req.header("Authorization").replace("Bearer ", "");
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const routineActivityId = req.params.routineActivityId;
-      const userId = decoded.id;
-
+      const { routineActivityId } = req.params;
       const routineActivity = await getRoutineActivityById(routineActivityId);
-      if (routineActivity.id !== userId) {
-        return res.status(401).send({
-          activityId: activityId,
-          count: count,
-          duration: duration,
-          id: id,
-          routineId: routineId,
+
+      const id = routineActivityId;
+      const deleteRoutineActivity = await destroyRoutineActivity(id);
+
+      const routine = await getRoutineById(routineActivity.routineId);
+      console.log(routine, "here", req.user);
+      if (routine.creatorId === req.user.id) {
+        res.send(deleteRoutineActivity);
+      } else {
+        res.status(403);
+        next({
+          error: "error",
+          message: UnauthorizedDeleteError(req.user.username, routine.name),
+          name: "error",
         });
       }
-
-      await destroyRoutineActivity(routineActivityId);
-      res.status(204).send;
     } catch (error) {
       next(error);
     }
