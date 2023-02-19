@@ -72,7 +72,7 @@ usersRouter.post("/login", async (req, res, next) => {
 });
 // GET /api/users/me
 
-usersRouter.get("/me", requireUser, (req, res, next) => {
+usersRouter.get("/me", (req, res, next) => {
   try {
     res.send(req.user);
   } catch (error) {
